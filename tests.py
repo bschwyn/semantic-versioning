@@ -7,6 +7,9 @@ class Test(unittest.TestCase):
     def testtest(self):
         self.assertEqual(5,5)
 
+    def test_main(self):
+        self.assertIsNone(main)
+
     def test_cli(self):
         self.assertEqual(["hello", "world", "foo"], get_cli_input("hello     world   foo "))
         self.assertEqual(, get_cli_input(("")))

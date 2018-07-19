@@ -40,7 +40,7 @@
 
 
 import sys
-
+import string
 import re
 
 class SemVer():
@@ -173,24 +173,29 @@ def get_cli_input(args):
     return args
 
 
-
-def main():
+def main(input_string):
     #check if whitespace
-    input_string = sys.argv[1]
     if not input_string.isspace():
-        args = get_cli_input(input_string)
-        valid = is_input_valid(args)
-        if valid:
-            semver1 = parse_input_to_semver(args[0])
-            semver2 = parse_input_to_semver(args[1])
-            result = comparison(semver1, semver2)
-            print(result)
+
+        #could be invalid by having whitespace before semantic version string
+        if input_string[0] in string.whitespace:
+            #I really don't like nested if statements, and would like to change this to a switch-case
+            #also this could be very helpful in the more complicated statements above.
+
+            args = get_cli_input(input_string)
+            valid = is_input_valid(args)
+            if valid:
+                semver1 = parse_input_to_semver(args[0])
+                semver2 = parse_input_to_semver(args[1])
+                result = comparison(semver1, semver2)
+                print(result)
         else:
             print("invalid")
 
 
 if __name__=="__main__":
-    main()
+    input_string = sys.argv[1]
+    main(input_string)
 
 
 
