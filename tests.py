@@ -9,7 +9,7 @@ class Test(unittest.TestCase):
 
     def test_cli(self):
         self.assertEqual(["hello", "world", "foo"], get_cli_input("hello     world   foo "))
-
+        self.assertEqual(, get_cli_input(("")))
         #should be false get_cli_input("   helo world  foo")
 
     def test_is_valid_input(self):

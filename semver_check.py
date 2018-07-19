@@ -175,16 +175,18 @@ def get_cli_input(args):
 
 
 def main():
-
-    args = get_cli_input(sys.argv[1])
-    valid = is_input_valid(args)
-    if valid:
-        semver1 = parse_input_to_semver(args[0])
-        semver2 = parse_input_to_semver(args[1])
-        result = comparison(semver1, semver2)
-        print(result)
-    else:
-        print("invalid")
+    #check if whitespace
+    input_string = sys.argv[1]
+    if not input_string.isspace():
+        args = get_cli_input(input_string)
+        valid = is_input_valid(args)
+        if valid:
+            semver1 = parse_input_to_semver(args[0])
+            semver2 = parse_input_to_semver(args[1])
+            result = comparison(semver1, semver2)
+            print(result)
+        else:
+            print("invalid")
 
 
 if __name__=="__main__":
