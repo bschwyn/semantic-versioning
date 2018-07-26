@@ -191,9 +191,12 @@ def main_cli(args):
         result = None
     elif len(args) == 3:
         valid = is_arg_valid(args[1]) and is_arg_valid(args[2])
-        semver1 = parse_input_to_semver(args[0])
-        semver2 = parse_input_to_semver(args[1])
-        result = comparison(semver1, semver2)
+        if valid:
+            semver1 = parse_input_to_semver(args[0])
+            semver2 = parse_input_to_semver(args[1])
+            result = comparison(semver1, semver2)
+        else:
+            result = "invalid"
     else:
         result = "invalid"
     if result:
@@ -211,25 +214,6 @@ def main_stdin(line_of_stdin):
         result = "invalid"
     if result:
         print(result)
-
-def main(input_string):
-    #check if whitespace
-    if not input_string.isspace():
-
-        #could be invalid by having whitespace before semantic version string
-        if input_string[0] in string.whitespace:
-            #I really don't like nested if statements, and would like to change this to a switch-case
-            #also this could be very helpful in the more complicated statements above.
-
-            args = get_cli_input(input_string)
-            valid = is_input_valid(args)
-            if valid:
-                semver1 = parse_input_to_semver(args[0])
-                semver2 = parse_input_to_semver(args[1])
-                result = comparison(semver1, semver2)
-                print(result)
-        else:
-            print("invalid")
 
 
 if __name__=="__main__":
