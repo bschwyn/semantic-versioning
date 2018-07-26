@@ -161,6 +161,8 @@ def is_arg_valid(input):
     return valid and ppm_valid
 
 def is_input_valid(input):
+    if input[0] in string.whitespace:
+        return False
 
     input = input.split()
     if len(input) != 2:
@@ -172,6 +174,43 @@ def get_cli_input(args):
     args.split()
     return args
 
+
+#thinking about whether or not command line input should look like
+#python semver_check "1.2.3 4.5.6"
+#or
+#python semver_check 1.2.3 4.5.6
+#or
+#"python semver_check 1.2.3 4.5.6"
+
+#most programs I know use a format more similar to the second, and this would also
+#remove the case of having to check if the first character is
+
+def main_cli(args):
+    #this does not fit the specification because of what happens with initial whitespace
+    if len(args) == 1: #whitespace
+        result = None
+    elif len(args) == 3:
+        valid = is_arg_valid(args[1]) and is_arg_valid(args[2])
+        semver1 = parse_input_to_semver(args[0])
+        semver2 = parse_input_to_semver(args[1])
+        result = comparison(semver1, semver2)
+    else:
+        result = "invalid"
+    if result:
+        print(result)
+
+def main_stdin(line_of_stdin):
+    if line_of_stdin == "":
+        result = None
+    elif is_input_valid(line_of_stdin):
+        args = line_of_stdin.split()
+        semver1 = parse_input_to_semver(args[0])
+        semver2 = parse_input_to_semver(args[1])
+        result = comparison(semver1, semver2)
+    else:
+        result = "invalid"
+    if result:
+        print(result)
 
 def main(input_string):
     #check if whitespace
@@ -194,6 +233,7 @@ def main(input_string):
 
 
 if __name__=="__main__":
+    sys.stdin.readlines()
     input_string = sys.argv[1]
     main(input_string)
 
