@@ -55,11 +55,11 @@ class SemVer():
 def comparison(semver1, semver2):
     pass
 
-def is_postive_integer_w_no_leading_zeros(string):
-    pass
 
-def is_valid_major(string):
-    return is_non_negative_integer(string)
+
+#---------------------------------------------------
+#functions for validating version numbers as correct
+#---------------------------------------------------
 
 def is_non_negative_integer(string):
     if string== '0':
@@ -69,85 +69,70 @@ def is_non_negative_integer(string):
     else:
         return False
 
+def is_valid_major(string):
+    return is_non_negative_integer(string)
+
 def is_valid_minor(string):
     return is_non_negative_integer(string)
 
 def is_valid_patch(string):
     return is_non_negative_integer(string)
 
-def is_valid_prerelease(string):
-    return re.match(r"[0-9A-Za-z-]", string)
-
-
-def is_valid_metadata(string):
-    return re.match(r"[0-9A-Za-z-]", string)
-
-def is_patch_prerelease_meta_valid(input):
-    #patch only [nonneg or 0]
-    #patch and prerelase [nonneg or 0 - [any . or - separated asccii]
-    #patch and meta #plus [nonnegative or 0 + ascii alphanumerics or -]
-    #patch prelease and meta [nonnegative or 0 - any number dot separated ascii / hyphens + ascii or -
-
-    input = input.split('+')
-    if len(input) == 1:
-        #patch and/or prerelease
-        input = input[0].split('-', maxsplit=1)
-        if len(input) ==2:
-            return is_valid_patch(input[0]) and is_valid_prerelease(input[1])
-        else:
-            return is_valid_patch(input[0])
-
-    elif len(input) == 2:
-        #yes metadata
-
-        #prelease?
-        patch_and_prerelease = input[0].split('-', maxsplit=1)
-        if len(patch_and_prerelease) == 1:
-            return is_valid_patch(patch_and_prerelease[0]) and \
-                   is_valid_metadata(input[1])
-        else:
-            return is_valid_patch(patch_and_prerelease[0]) and \
-                   is_valid_prerelease(patch_and_prerelease[1]) and \
-                   is_valid_metadata(input[1])
+def is_valid_identifier(id):
+    if id == "":
+        return False
+    elif re.match(r"[0-9]", id):
+        return is_non_negative_integer(id)
+    elif re.match(r"[0-9A-Za-z-]", id):
+        return True
     else:
         return False
 
-def parse_patch_prerelease_meta(input):
+def is_valid_metadata_identifier(id):
+    if id == "":
+        return False
+    elif re.match(r"[0-9A-Za-z-]", id):
+        return True
+    else:
+        return False
+
+def is_valid_prerelease(string):
+    identifiers = string.split('.')
+    return all([x for x in identifiers if is_valid_identifier(x)])
+
+def is_valid_metadata(string):
+    identifiers = string.split('.')
+    return all([x for x in identifiers if is_valid_metadata_identifier(x)])
+
+def is_valid_patch_and_prerelease(input):
+    input = input[0].split('-', maxsplit=1)
+
+    # patch and prerelease
+    if len(input) == 2:
+        return is_valid_patch(input[0]) and is_valid_prerelease(input[1])
+
+    # only patch
+    else:
+        return is_valid_patch(input[0])
+
+def is_patch_prerelease_meta_valid(input):
+
     input = input.split('+')
-    if len(input) == 1:
-        #patch and/or prerelease
-        input = input[0].split('-', maxsplit=1)
-        patch = input[0]
-        prerelease = input[1]
-        metadata = None
-    elif len(input) == 2:
-        #yes metadata
-        metadata = input[1]
 
-        #prelease?
-        patch_and_prerelease = input[0].split('-', maxsplit=1)
-        if len(patch_and_prerelease) == 1:
-            patch = patch_and_prerelease[0]
-            prerelease = None
-        else:
-            patch = patch_and_prerelease[0]
-            prerelease = patch_and_prerelease[1]
+    if len(input) == 1:     #no metadata,  #1.2.3-alpha--2.1 or 1.2.3
+        return is_valid_patch_and_prerelease(input[0])
 
-    return patch, prerelease, metadata
+    elif len(input) == 2:   #yes metadata
+        #1.2.3-alpha+001, 1.2.3+001, 1.2.3+0-1-0-1, 1.2.3-a-a-+101.13-aaa
+        return is_valid_patch_and_prerelease(input[0]) and is_valid_metadata(input[1])
 
-def parse_input_to_semver(input):
-
-    input = input.split('.', maxsplit=2)
-    major = input[0]
-    minor = input[1]
-    patch, prerelease, meta = parse_patch_prerelease_meta(input[2])
-
-    newSemVer= SemVer(major, minor, patch, prerelease, meta)
-    return newSemVer
+    else:
+        return False
 
 def is_arg_valid(input):
     valid = True
 
+    # major is before first s
     input = input.split('.', maxsplit=1)
     if not is_valid_major(input[0]):
         valid = False
@@ -156,9 +141,10 @@ def is_arg_valid(input):
     if not is_valid_minor(input[0]):
         valid = False
 
-    ppm_valid = is_patch_prerelease_meta_valid(input[1])
+    if not is_patch_prerelease_meta_valid(input[1]):
+        valid = False
 
-    return valid and ppm_valid
+    return valid
 
 def is_input_valid(input):
     if input[0] in string.whitespace:
@@ -169,10 +155,44 @@ def is_input_valid(input):
         return False
     return is_arg_valid(input[0]) and is_arg_valid(input[1])
 
+#------------------------------------------
+#after validation parse the version number into a semVer class
+#------------------------------------------
 
-def get_cli_input(args):
-    args.split()
-    return args
+def parse_input_to_semver(input):
+
+    input = input.split('.', maxsplit=2)
+    major = input[0]
+    minor = input[1]
+
+    input = input.split('+')
+    if len(input) == 1:
+        # patch and/or prerelease
+        input = input[0].split('-', maxsplit=1)
+        patch = input[0]
+        prerelease = input[1]
+        metadata = None
+    elif len(input) == 2:
+        # yes metadata
+        metadata = input[1]
+
+        # prelease?
+        patch_and_prerelease = input[0].split('-', maxsplit=1)
+        if len(patch_and_prerelease) == 1:
+            patch = patch_and_prerelease[0]
+            prerelease = None
+        else:
+            patch = patch_and_prerelease[0]
+            prerelease = patch_and_prerelease[1]
+
+    return major, minor, patch, prerelease, metadata
+
+
+
+
+#def get_cli_input(args):
+#    args.split()
+#    return args
 
 
 #thinking about whether or not command line input should look like
