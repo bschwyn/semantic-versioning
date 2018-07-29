@@ -148,3 +148,27 @@ def test_is_prerelease_valid(valid, string):
 )
 def test_is_prerelease_valid(valid, string):
     assert is_valid_prerelease(string)==valid
+
+@pytest.mark.parametrize(
+    'valid', 'string', [
+        (True, "1"),
+        (True, "23"),
+        (True, "0"),
+        (False, "01"),
+        (False, "-1")
+    ]
+)
+def test_is_non_is_non_negative_integer(valid,string):
+    assert is_non_negative_integer(string) == valid
+
+@pytest.mark.parametrize(
+    'valid', 'string', [
+        (True, "1"),
+        (True, "23"),
+        (True, "0"),
+        (False, ""),
+        (False, "-1")
+    ]
+)
+def test_is_valid_prerelease_identifier(id):
+
