@@ -174,7 +174,7 @@ def is_valid_patch(string):
     return is_non_negative_integer(string)
 
 def is_valid_prerelease_identifier(id):
-    #identifers must comprise only ascii alphanumerics and hypen
+    #identifers must comprise only ascii alphanumerics and hyphen
     #identifier must not be empty
     #numeric identifiers must not include leading zeroes
     if id == "":
@@ -237,7 +237,7 @@ def is_patch_prerelease_meta_valid(input):
     else:
         return False
 
-def is_arg_valid(input):
+def is_arg_valid(input): #test
     valid = True
 
     #major

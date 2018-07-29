@@ -78,34 +78,31 @@ def test_main_stdin(capsys):
     captured = capsys.readouterr()
     assert captured.out == "invalid\n"
 
-def create_is_arg_valid_params(self):
-    t1 = (True, "1.2.3")
-    t2 = (True, "11.12.13")
-    t3 = (True, "0.0.1")
-    t4 = (False, "00.1.0")
-    t5 = (True, "1.2.03")
-    t6 = (True, "1.02.3")
-    t7 = (False, "-1.2.3")
-    t8 = (False, "1.-2.3")
-    t9 = (False, "1.-02.3")
-    t10 = (False, "-0.2.3")
-    t11 = (False, "1.2.3-")
-    t12 = (False, "1.2.3-alph*a")
-    t13 = (True, "1.2.3-aLp23aHa")
-    t14 = (True, "1.2.3-al-al-a-")
-    t15 = (True, "1.2.3-01.1.3alpha")
-    t16 = (True, "1.2.3-0alpha")
-    t17 = (True,"1.2.3-0.2.3")
-    # do ONLY numeric identifiers have no leading zeros? what about alphanumeric identifiers?
-    t18 = (True,"1.2.3-alph+001")
-    t19 = (True, "1.2.3+0001-001-1.2.3")
-    t20 = (True, "1.2.3-1.2.3+123-001-11-1")
 
-    ts = [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20]
-    return ts
-
-@pytest.mark.parametrize(('expected', 'input'),create_is_arg_valid_params())
-def test_is_arg_valid(self, expected, input):
+@pytest.mark.parametrize(
+    'expected', 'input', [
+        (True, "1.2.3"),
+        (True, "11.12.13"),
+        (True, "0.0.1"),
+        (False, "00.1.0"),
+        (True, "1.2.03"),
+        (True, "1.02.3"),
+        (False, "-1.2.3"),
+        (False, "1.-2.3"),
+        (False, "1.-02.3"),
+        (False, "-0.2.3"),
+        (False, "1.2.3-"),
+        (False, "1.2.3-alph*a"),
+        (True, "1.2.3-aLp23aHa"),
+        (True, "1.2.3-al-al-a-"),
+        (True, "1.2.3-01.1.3alpha"),
+        (True, "1.2.3-0alpha"),
+        (True,"1.2.3-0.2.3"),
+        (True,"1.2.3-alph+001"),
+        (True, "1.2.3+0001-001-1.2.3"),
+        (True, "1.2.3-1.2.3+123-001-11-1")
+    ])
+def test_is_arg_valid(expected, input):
     assert is_input_valid(input)==expected
 
 @pytest.mark.parametrize(
@@ -139,14 +136,14 @@ def test_is_prerelease_valid(valid, string):
 #Build metadata MAY be denoted by appending a plus sign and a series of dot separated id
 @pytest.mark.parametrize(
     'valid', 'string', [
-        (True, "1.0.0-alpha"),
-        (True, "1.0.0-alpha.1"),
-        (True, "1ad.0adj38-1"),
-        (False, "3.01.49-alpha"),
-        (False, "3.0.1..1")
+        (True, "001"),
+        (True, "12013"),
+        (True, "exp.sha.51145"),
+        (False, "exp.sha..1055"),
+        (False, "3.0.1+18.1")
     ]
 )
-def test_is_prerelease_valid(valid, string):
+def test_is_valid_metadata(valid, string):
     assert is_valid_prerelease(string)==valid
 
 @pytest.mark.parametrize(
@@ -164,11 +161,30 @@ def test_is_non_is_non_negative_integer(valid,string):
 @pytest.mark.parametrize(
     'valid', 'string', [
         (True, "1"),
-        (True, "23"),
+        (True, ""),
         (True, "0"),
+        (True, "a---Z001")
+        (True, "-1")
         (False, ""),
-        (False, "-1")
+        (False, "01"),
+        (False, "##123*")
     ]
 )
-def test_is_valid_prerelease_identifier(id):
+def test_is_valid_prerelease_identifier(valid, string):
+    assert is_valid_prerelease(string) == valid
+
+@pytest.mark.parametrize(
+    'valid', 'string', [
+        (True, "1"),
+        (True, ""),
+        (True, "0"),
+        (True, "a---Z001")
+        (True, "-1")
+        (False, ""),
+        (True, "01"),
+        (False, "##123*")
+    ]
+)
+def test_is_valid_metadata_identifier(valid, string):
+    assert is_valid_prerelease(string) == valid
 
