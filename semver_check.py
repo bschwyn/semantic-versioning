@@ -156,7 +156,7 @@ def compare_prerelease(pre1, pre2, patch):
 #functions for validating version numbers as correct
 #---------------------------------------------------
 
-def is_non_negative_integer(string):
+def is_non_negative_integer(string): #have test
     if string== '0':
         return True
     elif string[0] != 0 and int(string) > 0:
@@ -173,7 +173,7 @@ def is_valid_minor(string):
 def is_valid_patch(string):
     return is_non_negative_integer(string)
 
-def is_valid_prerelease_identifier(id):
+def is_valid_prerelease_identifier(id): #have test
     #identifers must comprise only ascii alphanumerics and hyphen
     #identifier must not be empty
     #numeric identifiers must not include leading zeroes
@@ -186,7 +186,7 @@ def is_valid_prerelease_identifier(id):
     else:
         return False
 
-def is_valid_metadata_identifier(id):
+def is_valid_metadata_identifier(id): #have test
     #identifers must comprise only ascii alphanumerics and hyphen
     #identifers must not be empty. [leading zeroes ok]
     if id == "":
@@ -196,14 +196,14 @@ def is_valid_metadata_identifier(id):
     else:
         return False
 
-def is_valid_prerelease(string):
+def is_valid_prerelease(string): #have test
     #pre-release version MAY be denoted by appending a hyphen and a series of dot separated identifiers
     #identifiers MUST comprise only ASCII alphanumeris and hyphen
     # identifiers MUST NOT be empty, MUST NOT include leading zeroes
     identifiers = string.split('.')
     return all([x for x in identifiers if is_valid_prerelease_identifier(x)])
 
-def is_valid_metadata(string):
+def is_valid_metadata(string): #have test
     #build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers
     #identifiers MUST comprise only ASCII alphanumerics and hyphen,
     #identifers MUST NOT be empty
@@ -237,7 +237,7 @@ def is_patch_prerelease_meta_valid(input):
     else:
         return False
 
-def is_arg_valid(input): #test
+def is_arg_valid(input): #have test
     valid = True
 
     #major
@@ -256,7 +256,7 @@ def is_arg_valid(input): #test
 
     return valid
 
-def is_input_valid(input):
+def is_input_valid(input): #have test
     if input[0] in string.whitespace:
         return False
 
@@ -328,11 +328,24 @@ def main_stdin(line_of_stdin):
     if result:
         print(result)
 
+def main(args):
+    if len(args) == 1: #whitespace
+        messages = sys.stdin.readlines()
+        for line in messages:
+            line.replace('\n', '')
+            main_stdin(line)
+    elif len(args) == 3:
+        valid = is_arg_valid(args[1]) and is_arg_valid(args[2])
+        if valid:
+            semver1 = parse_input_to_semver(args[0])
+            semver2 = parse_input_to_semver(args[1])
+            result = comparison(semver1, semver2)
+        else:
+            result = "invalid"
+    else:
+        result = "invalid"
+    if result:
+        print(result)
 
 if __name__=="__main__":
-    sys.stdin.readlines()
-    input_string = sys.argv[1]
-    main(input_string)
-
-
-
+    main()

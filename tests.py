@@ -1,38 +1,9 @@
-#import unittest
-from unittest.mock import patch, call
-import io
-#import unittest.mock
 
 from semver_check import *
 import pytest
 
-def incr(x):
-    return x + 1
 
-def test_answer():
-    assert(incr(3) == 5)
 
-def testtest(self):
-    self.assertEqual(5,5)
-
-#def test_main(self):
-#    self.assertIsNone(main)
-
-#def test_cli(self):
-#    self.assertEqual(["hello", "world", "foo"], get_cli_input("hello     world   foo "))
-#    self.assertEqual("", get_cli_input(("")))
-    #should be false get_cli_input("   helo world  foo")
-
-def test_is_valid_input(self):
-    t1 = "1.3.6 1.4.2"
-    t2 = "1.7.9 1.3.5 0.0.2"
-    t3 = "4.2.3-beta 4.2.3-alpha"
-    t4 = "1.6 1.6.3"
-    print("tests pass if true")
-    print(True == is_input_valid(t1))
-    print(False == is_input_valid(t2))
-    print(True == is_input_valid(t3))
-    print(False == is_input_valid(t4))
 
 
 def test_main_cli(capsys):
@@ -78,6 +49,17 @@ def test_main_stdin(capsys):
     captured = capsys.readouterr()
     assert captured.out == "invalid\n"
 
+@pytest.mark.parametrize(
+    'valid', 'string', [
+        (True,"1.3.6 1.4.2"),
+        (True, "4.2.3-beta 4.2.3-alpha")
+        (False, "1.8.9 1.3.5 0.0.2"),
+        (False, "1.6 1.6.3")
+    ]
+)
+def test_is_valid_input(valid, string):
+    assert is_input_valid(string) == valid
+
 
 @pytest.mark.parametrize(
     'expected', 'input', [
@@ -119,6 +101,7 @@ def test_is_arg_valid(expected, input):
 def test_is_non_negative_integer(valid, number):
     assert is_non_negative_integer(number)==valid
 
+
 #valid prerelease MAY be denoted by a hypen and a series of dot separted identifiers
 #identifiers ACII alphanumerics and hyphen [0-9A-Za-z-], identifiers must not be empty
 @pytest.mark.parametrize(
@@ -149,18 +132,6 @@ def test_is_valid_metadata(valid, string):
 @pytest.mark.parametrize(
     'valid', 'string', [
         (True, "1"),
-        (True, "23"),
-        (True, "0"),
-        (False, "01"),
-        (False, "-1")
-    ]
-)
-def test_is_non_is_non_negative_integer(valid,string):
-    assert is_non_negative_integer(string) == valid
-
-@pytest.mark.parametrize(
-    'valid', 'string', [
-        (True, "1"),
         (True, ""),
         (True, "0"),
         (True, "a---Z001")
@@ -187,4 +158,22 @@ def test_is_valid_prerelease_identifier(valid, string):
 )
 def test_is_valid_metadata_identifier(valid, string):
     assert is_valid_prerelease(string) == valid
+
+def test_is_valid_patc_and_prerelease():
+    pass
+
+def test_is_patch_prerelease_meta_valid():
+    pass
+
+@pytest.mark.parametrize(
+    'input', 'major','minor','patch','pre','meta', [
+        ("1.0.0", "1","0","0",None,None),
+        ("1.2.3+123", "1","2","3",None,"123"),
+        ("1.2.3-alpha", "1","2","3","alpha",None)
+        ("1.2.3-alpha+001", "1","2","3","alpha","001"),
+    ]
+)
+def parse_input_to_semver(input, major, minor, patch, prere, meta):
+    mj, mn, pt, pr, m = parse_input_to_semver(input)
+    assert mj == major and mn == minor and pt == patch and pr == prere and m == meta
 
