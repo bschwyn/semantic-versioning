@@ -45,12 +45,12 @@ import re
 
 class SemVer():
 
-    def __init__(self, major, minor, patch, prerelease, meta):
-        self.major = major
-        self.minor = minor
-        self.patch = patch
-        self.prerelease = prerelease
-        self.meta = meta
+    def __init__(self, input):
+        self.major = input[0]
+        self.minor = input[1]
+        self.patch = input[2]
+        self.prerelease = input[3]
+        self.meta = input[4]
 
 def comparison(semver1, semver2):
 
@@ -157,12 +157,19 @@ def compare_prerelease(pre1, pre2, patch):
 #---------------------------------------------------
 
 def is_non_negative_integer(string): #have test
-    if string== '0':
-        return True
-    elif string[0] != 0 and int(string) > 0:
-        return True
-    else:
+    try:
+        if string== '0':
+            return True
+        elif string[0] != '0' and int(string) > 0:
+            return True
+        else:
+            return False
+    except Exception:
         return False
+
+def is_alnum_or_hyphen(id):
+    x = id.replace('-','')
+    return x.isalnum()
 
 def is_valid_major(string):
     return is_non_negative_integer(string)
@@ -177,23 +184,29 @@ def is_valid_prerelease_identifier(id): #have test
     #identifers must comprise only ascii alphanumerics and hyphen
     #identifier must not be empty
     #numeric identifiers must not include leading zeroes
-    if id == "":
-        return False
-    elif re.match(r"[0-9]", id):
-        return is_non_negative_integer(id)
-    elif re.match(r"[0-9A-Za-z-]", id):
-        return True
-    else:
+    try:
+        if id == "":
+            return False
+        elif id.isnumeric():
+            return is_non_negative_integer(id)
+        elif is_alnum_or_hyphen(id):
+            return True
+        else:
+            return False
+    except Exception:
         return False
 
 def is_valid_metadata_identifier(id): #have test
     #identifers must comprise only ascii alphanumerics and hyphen
     #identifers must not be empty. [leading zeroes ok]
-    if id == "":
-        return False
-    elif re.match(r"[0-9A-Za-z-]", id):
-        return True
-    else:
+    try:
+        if id == "":
+            return False
+        elif is_alnum_or_hyphen(id):
+            return True
+        else:
+            return False
+    except Exception:
         return False
 
 def is_valid_prerelease(string): #have test
@@ -201,18 +214,18 @@ def is_valid_prerelease(string): #have test
     #identifiers MUST comprise only ASCII alphanumeris and hyphen
     # identifiers MUST NOT be empty, MUST NOT include leading zeroes
     identifiers = string.split('.')
-    return all([x for x in identifiers if is_valid_prerelease_identifier(x)])
+    return all([is_valid_prerelease_identifier(x) for x in identifiers])
 
 def is_valid_metadata(string): #have test
     #build metadata MAY be denoted by appending a plus sign and a series of dot separated identifiers
     #identifiers MUST comprise only ASCII alphanumerics and hyphen,
     #identifers MUST NOT be empty
     identifiers = string.split('.')
-    return all([x for x in identifiers if is_valid_metadata_identifier(x)])
+    return all([is_valid_metadata_identifier(x) for x in identifiers])
 
 def is_valid_patch_and_prerelease(input):
     #prerelease may or may not be present
-    input = input[0].split('-', maxsplit=1)
+    input = input.split('-', maxsplit=1)
 
     # patch and prerelease
     if len(input) == 2:
@@ -238,23 +251,29 @@ def is_patch_prerelease_meta_valid(input):
         return False
 
 def is_arg_valid(input): #have test
-    valid = True
+    #must do this carefully and step by step as all components may not be present
 
     #major
-    input = input.split('.', maxsplit=1)
+    input = input.split('.', maxsplit=1) #1.2.3-4 --> ["1", "2.3-4"]
+    if len(input) < 2:
+        return False
     if not is_valid_major(input[0]):
-        valid = False
+        return False
+
 
     #minor
-    input = input[1].split('.', maxsplit=1)
+    input = input[1].split('.', maxsplit=1) #"2.3-4" --->["2", "3-4"]
+    if len(input) < 2:
+        return False
     if not is_valid_minor(input[0]):
-        valid = False
+        return False
 
     #patch and other
-    if not is_patch_prerelease_meta_valid(input[1]):
-        valid = False
+    if not is_patch_prerelease_meta_valid(input[1]): #3-4"
+        return False
 
-    return valid
+    return True
+
 
 def is_input_valid(input): #have test
     if input[0] in string.whitespace:
@@ -269,31 +288,35 @@ def is_input_valid(input): #have test
 #after validation parse the version number into a semVer class
 #------------------------------------------
 
-def parse_input_to_semver(input):
+def split_patch_and_prerelease(input):
+    input = input[0].split('-', maxsplit=1)
+    if len(input) == 1:
+        patch = input[0]
+        prerelease = None
+    elif len(input) == 2:
+        patch = input[0]
+        prerelease = input[1]
+    else:
+        return False #throw exception
+    return patch, prerelease
 
-    input = input.split('.', maxsplit=2)
+def parse_input_to_semver(semver_string):
+    #assuming string is valid...
+
+    input = semver_string.split('.', maxsplit=2)
     major = input[0]
     minor = input[1]
 
-    input = input.split('+')
+    input = input[2].split('+', maxsplit=1)
     if len(input) == 1:
-        # patch and/or prerelease
-        input = input[0].split('-', maxsplit=1)
-        patch = input[0]
-        prerelease = input[1]
+        # patch and/or prerelease, no metadata
         metadata = None
+        patch, prerelease = split_patch_and_prerelease(input[0])
+
     elif len(input) == 2:
         # yes metadata
         metadata = input[1]
-
-        # prelease?
-        patch_and_prerelease = input[0].split('-', maxsplit=1)
-        if len(patch_and_prerelease) == 1:
-            patch = patch_and_prerelease[0]
-            prerelease = None
-        else:
-            patch = patch_and_prerelease[0]
-            prerelease = patch_and_prerelease[1]
+        patch, prerelease = split_patch_and_prerelease(input[0])
 
     return major, minor, patch, prerelease, metadata
 
@@ -320,8 +343,8 @@ def main_stdin(line_of_stdin):
         result = None
     elif is_input_valid(line_of_stdin):
         args = line_of_stdin.split()
-        semver1 = parse_input_to_semver(args[0])
-        semver2 = parse_input_to_semver(args[1])
+        semver1 = SemVer(parse_input_to_semver(args[0]))
+        semver2 = SemVer(parse_input_to_semver(args[1]))
         result = comparison(semver1, semver2)
     else:
         result = "invalid"
