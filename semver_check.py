@@ -1,47 +1,13 @@
-#notes
-#reserve problem
-#author: ben schwyn
+#implementation of semantic versioning
+#https://semver.org/ specification here
 
-#not every language can be sent over
-#explicitly a learning project, consequences of failure
-# idiosyncratic human needs
-# how do people choose projects
-# launching in
-# no expected timeline
-
-#implement semantic versioning
-#Major.Minor.Patch
-#MAJOR version when you make incompatible API changes,
-#MINOR version when you add functionality in a backwards-compatible manner, and
-#PATCH version when you make backwards-compatible bug fixes.
-# version lock (the inability to upgrade a package without having to release new versions of every dependent package)
-#version promiscuity (assuming compatibility with more future versions than is reasonable)
-
-# For this system to work, you first need to declare a public API. This may consist of documentation or be enforced by the code itself. Regardless, it is important that this API be clear and precise.
-# Once you identify your public API, you communicate changes to it with specific increments to your version number.
-
-#what does the public API look like?
-
-#a module
-#convenient data type for semantic versions
-
-#timing:
-#4:40 time!
-#4:30 start upload ish
-#4:20 documentation
-#4:00 clean up
-#input &test 2:00
-#class &t 2:45
-#specification details & comparison functions
-
-
-#check validity, then construct datatype with valid input
-#attempt to construct datatype with potentially invalid input, check validity on the way
-
+#provides a datatype for semantic versions, in which major, minor, patch, pre-release, and metadata can be separately
+#accessed.
+#A way to parse semver strings as described in the specification
+#comparison functions to implement precedence as described in the specification
 
 import sys
 import string
-import re
 
 class SemVer():
 
@@ -51,6 +17,15 @@ class SemVer():
         self.patch = input[2]
         self.prerelease = input[3]
         self.meta = input[4]
+
+
+#---------------------------------------------------
+#comparison functions to implement precedence.
+#---------------------------------------------------
+
+#a > b ---> 1
+#a == b --> 0
+#a < b --> -1
 
 def comparison(semver1, semver2):
 
@@ -179,10 +154,8 @@ def compare_prerelease(pre1, pre2, patch):
         return patch
 
 
-
-
 #---------------------------------------------------
-#functions for validating version numbers as correct
+#functions for validating semantic version strings as correct
 #---------------------------------------------------
 
 def is_non_negative_integer(string): #have test
@@ -353,11 +326,17 @@ def main_cli(args):
     #this does not fit the specification because of what happens with initial whitespace
     if len(args) == 1: #whitespace
         result = None
+
+    #validation
     elif len(args) == 3:
         valid = is_arg_valid(args[1]) and is_arg_valid(args[2])
         if valid:
+
+            #parsing
             semver1 = parse_input_to_semver(args[0])
             semver2 = parse_input_to_semver(args[1])
+
+            #comparison
             result = comparison(semver1, semver2)
         else:
             result = -2
