@@ -392,26 +392,6 @@ def print_result(result):
 
 
 
-
-"""def main(args):
-    if len(args) == 1: #whitespace
-        messages = sys.stdin.readlines()
-        for line in messages:
-            line.replace('\n', '')
-            main_stdin(line)
-    elif len(args) == 3:
-        valid = is_arg_valid(args[1]) and is_arg_valid(args[2])
-        if valid:
-            semver1 = parse_input_to_semver(args[0])
-            semver2 = parse_input_to_semver(args[1])
-            result = comparison(semver1, semver2)
-        else:
-            result = "invalid"
-    else:
-        result = "invalid"
-    return result"""
-
-
 if __name__=="__main__":
     messages = sys.stdin.readlines()
     for line in messages:
