@@ -11,6 +11,8 @@ This program verifies both the validity and the ordering of two semantic version
 which might detect packages in use and find the most recent version using a comparison process. With complicated pre-release 
 and metadata formats, it can become difficult to find the ordering of package versions.
 
+###usage
+
 To use the program in the command line, run
 ```
 python3 compare_semver.py
@@ -25,4 +27,31 @@ and use `ctrl-d` to finish the input. Press enter to enter multiple lines.
 To run tests, `pip install -U pytest 3.7.0` and run 
 ```
 pytest tests.py
+```
+###public api
+
+- empty lines are ignored
+
+A valid line of input will contain, in order:
+- 1) a valid semantic version string
+- 2) one or more whitespace characters
+- 3) another semantic version string
+- 4) zero or more whitespace characters
+
+invalid lines print the string "invalid" to std_out, and valid strings print "before" if the left version is earlier than the right, "after" if if the left version is later than the right, and "equal" if they have the same precedence.
+
+For example, given the following input:
+```
+1.3.6 1.4.2
+1.7.9 1.3.5 0.0.2
+
+4.2.3-beta     4.2.3-alpha
+1.6 1.6.3
+```
+The program prints:
+```
+before
+invalid
+after
+invalid
 ```
