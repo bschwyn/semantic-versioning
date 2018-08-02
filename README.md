@@ -11,7 +11,7 @@ This program verifies both the validity and the ordering of two semantic version
 which might detect packages in use and find the most recent version using a comparison process. With complicated pre-release 
 and metadata formats, it can become difficult to find the ordering of package versions.
 
-### usage
+### Usage
 
 To use the program in the command line, run
 ```
@@ -28,7 +28,7 @@ To run tests, `pip install -U pytest 3.7.0` and run
 ```
 pytest tests.py
 ```
-### public api
+### Public Api
 
 - empty lines are ignored
 
