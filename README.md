@@ -38,7 +38,7 @@ A valid line of input will contain, in order:
 - 3) another semantic version string
 - 4) zero or more whitespace characters
 
-invalid lines print the string "invalid" to std_out, and valid strings print "before" if the left version is earlier than the right, "after" if if the left version is later than the right, and "equal" if they have the same precedence.
+Invalid lines print the string "invalid" to std_out, and valid strings print "before" if the left version is earlier than the right, "after" if if the left version is later than the right, and "equal" if they have the same precedence.
 
 For example, given the following input:
 ```
