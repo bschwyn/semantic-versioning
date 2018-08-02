@@ -72,7 +72,7 @@ def comparison(semver1, semver2):
 
     major2 = semver2.major
     minor2 = semver2.minor
-    patch2 = semver2.minor
+    patch2 = semver2.patch
     prerelease2 = semver2.prerelease
 
     major_result = compare_major(major1, major2)
@@ -116,18 +116,44 @@ def compare_patch(patch1, patch2, minor):
         return minor
 
 
-def compare_prerelease_ids(pre1, pre2):
-    # identifiers with letters or hyphens are compared lexically in ASCII sort order. Numeric identifiers always have
-    # lower precedence than non-numeric identifiers. A larger set of pre-release fields has a higher precedence than a
-    # smaller set, if all of the preceding identifiers are equal.
-
-    ids1 = pre1.split('.')
-    ids2 = pre1.split('.')
+def compare_prerelease_ids(ids1, ids2):
     # ids consisting of only digits are compared numerically
-    # ids with letters or hypens are compared lexically
+    # ids with letters or hyphens are compared lexically in ASCII sort order.
     # numeric identifiers always have lower precedence than non-numeric ids
-    # larger set of prerelease fields has a higher precedence than a smaller set if all the preceding identifiers are equal
+    # larger set of prerelease fields has a higher precedence than a
+    # smaller set if all the preceding identifiers are equal
 
+    i = 0
+    min_len = min(len(ids1), len(ids2))
+    while i < min_len:
+        id1 = ids1[i]
+        id2 = ids2[i]
+        if is_non_negative_integer(id1) and is_non_negative_integer(id2):
+            if int(id1) > int(id2):
+                return 1
+            elif int(id1) < int(id2):
+                return -1
+            else:
+                i += 1
+        elif is_non_negative_integer(id1):  # .1 < .beta
+            return -1
+        elif is_non_negative_integer(id2):
+            return 1
+        else:  # compare ascii sort order
+            if id1 > id2:  #
+                return 1
+            elif id1 < id2:
+                return -1
+            else:
+                i += 1
+    max_len = max(len(ids1), len(ids2))
+    if max_len > min_len:
+        if max_len == len(ids1):
+            return 1
+        else:  # max_len == len(ids2):
+            return -1
+    else:
+        return 0
 
 def compare_prerelease(pre1, pre2, patch):
     # precedence for two prerelease versions MUST be determined by comparing each dot separated identifier from left to
@@ -141,11 +167,14 @@ def compare_prerelease(pre1, pre2, patch):
         if pre1 == None and pre2 == None:
             return 0
         elif pre2 == None: #prerelease comes before no prerelease
-            return 1
-        elif pre1 == None:
             return -1
+        elif pre1 == None:
+            return 1
         else:
-            return compare_prerelease_ids(pre1,pre2)
+            ids1 = pre1.split('.')
+            ids2 = pre2.split('.')
+            return compare_prerelease_ids(ids1, ids2)
+
     else:
         return patch
 
@@ -288,8 +317,8 @@ def is_input_valid(input): #have test
 #after validation parse the version number into a semVer class
 #------------------------------------------
 
-def split_patch_and_prerelease(input):
-    input = input[0].split('-', maxsplit=1)
+def split_patch_and_prerelease(input_string):
+    input = input_string.split('-', maxsplit=1)
     if len(input) == 1:
         patch = input[0]
         prerelease = None
@@ -302,7 +331,6 @@ def split_patch_and_prerelease(input):
 
 def parse_input_to_semver(semver_string):
     #assuming string is valid...
-
     input = semver_string.split('.', maxsplit=2)
     major = input[0]
     minor = input[1]
@@ -318,7 +346,7 @@ def parse_input_to_semver(semver_string):
         metadata = input[1]
         patch, prerelease = split_patch_and_prerelease(input[0])
 
-    return major, minor, patch, prerelease, metadata
+    return [major, minor, patch, prerelease, metadata]
 
 
 def main_cli(args):
@@ -335,8 +363,7 @@ def main_cli(args):
             result = "invalid"
     else:
         result = "invalid"
-    if result:
-        print(result)
+    return result
 
 def main_stdin(line_of_stdin):
     if line_of_stdin == "":
@@ -348,8 +375,17 @@ def main_stdin(line_of_stdin):
         result = comparison(semver1, semver2)
     else:
         result = "invalid"
-    if result:
-        print(result)
+    return result
+
+def print_result(result):
+    if result == 1:
+        print("after")
+    elif result == 0:
+        print("equal")
+    elif result == -1:
+        print("before")
+    else:
+        print("invalid")
 
 def main(args):
     if len(args) == 1: #whitespace
@@ -367,8 +403,18 @@ def main(args):
             result = "invalid"
     else:
         result = "invalid"
-    if result:
-        print(result)
+    return result
+
+#main_stdin("1.0.0-alpha.beta 1.0.0-beta")
+bla = parse_input_to_semver('1.0.0-beta.2')
+semver1 = SemVer(bla)
+blabla = parse_input_to_semver("1.0.0-beta.11")
+semver2 = SemVer(blabla)
+comparison(semver1, semver2)
+
 
 if __name__=="__main__":
-    main()
+    messages = sys.stdin.readlines()
+    for line in messages:
+        r =main_stdin(line)
+        print_result(r)
