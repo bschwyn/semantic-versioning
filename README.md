@@ -55,3 +55,13 @@ invalid
 after
 invalid
 ```
+
+### Program Structure
+
+The program follows a basic flow of validation, parsing, and comparison.
+
+The validation occurs step by step, breaking off the first piece and then validating it before moving onto the next. Since not all components of the version string will always be present, splices might result in breaking apart pieces meant to stay together. For example, if I always spliced by first hyphen, this could separate the metada into two pieces in a string with a format of Major.Minor.Patch+Metadata, whereas if it was Major.minor.Patch-prerelease it would correctly separate the prerelease into one component. Rather than a complicated set of conditionals, I took an approach of splitting off a piece of the input, validating it, and then passing the intput to the next validator down the line of the semantic string. This process terminates if it comes across anything that invalidates the string.
+
+Parsing follows a similar process as validation, except that the string is assumed to already be valid, so is simpler.
+
+Also with the comparison process I compare (acccording to the specification) and then pass the state of the comparison to the next comparison function which operates on the versions or identifiers to the right. The overall `comparison` function startes at the left with `compare_major` and ends with `compare_prerelease` before returning the final state.
