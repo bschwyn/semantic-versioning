@@ -50,6 +50,7 @@ def comparison(semver1, semver2):
     patch2 = semver2.patch
     prerelease2 = semver2.prerelease
 
+    #pass the state of the compare function down the line of the semantic string
     major_result = compare_major(major1, major2)
     minor_result = compare_minor(minor1, minor2, major_result)
     patch_result = compare_patch(patch1, patch2, minor_result)
