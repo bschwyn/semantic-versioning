@@ -360,21 +360,24 @@ def main_cli(args):
             semver2 = parse_input_to_semver(args[1])
             result = comparison(semver1, semver2)
         else:
-            result = "invalid"
+            result = -2
     else:
-        result = "invalid"
+        result = -2
     return result
 
 def main_stdin(line_of_stdin):
-    if line_of_stdin == "":
-        result = None
-    elif is_input_valid(line_of_stdin):
-        args = line_of_stdin.split()
-        semver1 = SemVer(parse_input_to_semver(args[0]))
-        semver2 = SemVer(parse_input_to_semver(args[1]))
-        result = comparison(semver1, semver2)
-    else:
-        result = "invalid"
+    try:
+        if line_of_stdin == "":
+            result = None
+        elif is_input_valid(line_of_stdin):
+            args = line_of_stdin.split()
+            semver1 = SemVer(parse_input_to_semver(args[0]))
+            semver2 = SemVer(parse_input_to_semver(args[1]))
+            result = comparison(semver1, semver2)
+        else:
+            result = -2
+    except Exception:
+        return -2
     return result
 
 def print_result(result):
@@ -387,7 +390,10 @@ def print_result(result):
     else:
         print("invalid")
 
-def main(args):
+
+
+
+"""def main(args):
     if len(args) == 1: #whitespace
         messages = sys.stdin.readlines()
         for line in messages:
@@ -403,18 +409,12 @@ def main(args):
             result = "invalid"
     else:
         result = "invalid"
-    return result
-
-#main_stdin("1.0.0-alpha.beta 1.0.0-beta")
-bla = parse_input_to_semver('1.0.0-beta.2')
-semver1 = SemVer(bla)
-blabla = parse_input_to_semver("1.0.0-beta.11")
-semver2 = SemVer(blabla)
-comparison(semver1, semver2)
+    return result"""
 
 
 if __name__=="__main__":
     messages = sys.stdin.readlines()
     for line in messages:
         r =main_stdin(line)
+        print()
         print_result(r)

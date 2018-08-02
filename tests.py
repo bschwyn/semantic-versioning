@@ -10,7 +10,7 @@ import pytest
         (1, "0.0.1", "0.0.0"),
         (-1, "1.2.3", "1.3.3"),
         (-1, "1.2.3", "2.1.1"),
-        (-1, "1.0.0-alpha", ".0.0-alpha.1"),
+        (-1, "1.0.0-alpha", "1.0.0-alpha.1"),
         (-1, "1.0.0-alpha.beta", "1.0.0-beta"),
         (-1, "1.0.0-beta.2", "1.0.0-beta.11"),
         (-1, "1.0.0-rc.1", "1.0.0")
@@ -38,48 +38,16 @@ def test_compare_prerelease_ids(compare, ids1, ids2):
     assert compare_prerelease_ids(ids1, ids2) == compare
 
 
-def test_main_cli(capsys):
-
-    args = ["semver_check.py", "1.3.6", "1.4.2"]
-    main_cli(args)
-    captured = capsys.readouterr()
-    assert captured.out == "before\n"
-
-    args = ["semver_check.py", "1.3.5", "1.3.5", "0.0.2"]
-    main_cli(args)
-    captured = capsys.readouterr()
-    assert captured.out == "invalid\n"
-
-    args = ["semver_check.py", "4.2.3-beta", "4.2.3-alpha"]
-    main_cli(args)
-    captured = capsys.readouterr()
-    assert captured.out == "after\n"
-
-    args = ["semver_check.py", "1.6.3", "1.6.3"]
-    main_cli(args)
-    captured = capsys.readouterr()
-    assert captured.out == "equal\n"
-
-def test_main_stdin(capsys):
-    args = "1.3.6   1.4.2"
-    main_stdin(args)
-    captured = capsys.readouterr()
-    assert captured.out == "before\n"
-
-    args = "1.3.5 1.3.5 \t0.0.2"
-    main_stdin(args)
-    captured = capsys.readouterr()
-    assert captured.out == "invalid\n"
-
-    args = "4.2.3-beta 4.2.3-alpha"
-    main_stdin(args)
-    captured = capsys.readouterr()
-    assert captured.out == "after\n"
-
-    args = " 1.6.3  1.6.3"
-    main_stdin(args)
-    captured = capsys.readouterr()
-    assert captured.out == "invalid\n"
+@pytest.mark.parametrize(
+    'result, args', [
+        (-1, "1.3.6   1.4.2"),
+        (-2, "1.3.5 1.3.5 \t0.0.2"),
+        (1, "4.2.3-beta 4.2.3-alpha"),
+        (-2, " 1.6.3  1.6.3")
+    ]
+)
+def test_main_stdin(result, args):
+    assert main_stdin(args) == result
 
 @pytest.mark.parametrize(
     'valid, string', [
