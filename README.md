@@ -1,6 +1,4 @@
 
-#about
-=======
 # semantic-versioning
 
 In software management, keeping track of new package versions can become unweildy as they make changes that make it difficult
