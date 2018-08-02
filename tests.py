@@ -1,5 +1,5 @@
 
-from semver_check import *
+from compare_semver import *
 import pytest
 
 

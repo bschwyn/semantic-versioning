@@ -346,7 +346,7 @@ def main_cli(args):
 
 def main_stdin(line_of_stdin):
     try:
-        if line_of_stdin == "":
+        if line_of_stdin == "" or line_of_stdin in string.whitespace:
             result = None
         elif is_input_valid(line_of_stdin):
             args = line_of_stdin.split()
@@ -366,6 +366,8 @@ def print_result(result):
         print("equal")
     elif result == -1:
         print("before")
+    elif result == None:
+        pass
     else:
         print("invalid")
 
@@ -375,5 +377,4 @@ if __name__=="__main__":
     messages = sys.stdin.readlines()
     for line in messages:
         r =main_stdin(line)
-        print()
         print_result(r)
