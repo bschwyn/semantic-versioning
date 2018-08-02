@@ -12,16 +12,17 @@ which might detect packages in use and find the most recent version using a comp
 and metadata formats, it can become difficult to find the ordering of package versions.
 
 To use the program in the command line, run
-
+```
 python3 compare_semver.py
-
+```
 then type the versions:
-
+```
 python3 compare_semver.py
 1.2.3 1.2.3
+```
+and use `ctrl-d` to finish the input. Press enter to enter multiple lines.
 
-and use ctrl-d to finish the input. Press enter to enter multiple lines.
-
-To run tests, install pytest and run 
-
+To run tests, `pip install -U pytest 3.7.0` and run 
+```
 pytest tests.py
+```
