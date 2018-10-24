@@ -1,7 +1,7 @@
 
 # semantic-versioning
 
-In software management, keeping track of new package versions can become unweildy as they make changes that make it difficult
+In software management, keeping track of new package versions can become unwieldy as they make changes that make it difficult
 to safely move your own project forward. Semantic Versioning is a formal specification of how to assign numbers to new package
 versions in order to keep track of which changes are being made and what this will require from the program using the package.
 For example, a simple version has the format Major.Minor.Patch. Bug fixes that do not affect the API increment the patch version,
