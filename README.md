@@ -8,7 +8,7 @@ For example, a simple version has the format Major.Minor.Patch. Bug fixes that d
 backwards compatible API additions/changes increment the minor version, and incompatible changes to the API result in a change
 of the major version. The full specifiation can be found https://semver.org/
 
-This program verifies both the validity and the ordering of two semantic versions. This might be important for a larger program which detects packages installed and wants to find the most recent version using a comparison process.
+This program verifies both the validity of the input string and the ordering of two semantic versions. This might be important for a larger program which detects packages installed and wants to find the most recent version using a comparison process.
 
 ### Usage
 
